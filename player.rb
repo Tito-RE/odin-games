@@ -9,7 +9,7 @@ class Player
         @name = name
     end
 
-    # Ask for a valid coordinates from a the board
+    # Ask for a valid coordinates from the board by xy style
     def select_position(piece)
         coordinates = nil
         
@@ -27,5 +27,21 @@ class Player
         end
         return coordinates
     end
-
+    
+    #Ask for a valid choice from user
+    #def select_piece(piece)
+    #	coordinates = nil
+    	
+    	# Get coordinates from players
+    #	loop do
+     #       puts "Player #{@name}"
+      #      puts "Select a color: "
+       #     y = gets.chomp.to_i
+        #    
+         #   coordinate = @game.convert_position(piece,y)
+        #    
+       #     break if !coordinate.nil?
+      #  end
+     #   return coordinate
+    #end
 end
