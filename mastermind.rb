@@ -15,6 +15,13 @@ class MastermindGame
         @secret_code_colors = ['W','R','B','Y','G','P']
         @current_player_id = 1
         @players = [Player.new(self,"CodeMaker"),Player.new(self,"CodeBreaker")]
+        print_game_message()
+    end
+    
+    # Show the "white" and "red" feedback pieces
+    def print_game_message()
+        puts "0 => Color found in secret code"
+        puts "@ => Color match with secret code"
     end
     
     # Generate the random secret code from the pc
@@ -76,15 +83,65 @@ class MastermindGame
         return row, column
     end
     
+    # Check the user code vs the secret code
+    def check_combination(row,col,current_combination)
+        
+        local_secret_code = @secret_code
+        # local_secret_code = ['P','G','B','G'] # Testing
+        
+        # Convert the current object-array code to array  
+        local_current_combination = []
+        current_combination.each_with_index do |color, index|
+            local_current_combination << color.mark
+        end
+        
+        # Column where initialy assign the feedback
+        index_feedback = col + 1
+        
+        # Check for the same color in the same index
+        local_current_combination.each_with_index do |color, index|
+            if color == local_secret_code[index] 
+                # Assign a "flag" for the codes
+                local_secret_code[index] = "@"
+                local_current_combination[index] = "@"
+                
+                # Create a piece for the feedback
+                piece = Piece.new(current_player(),"@","@")
+                place_player_marker(current_player(), piece,  row, index_feedback)
+                
+                index_feedback += 1
+            end
+        end
+
+	# Check for colors present in both codes (without order)
+	local_current_combination.each_with_index do |color, index|
+	    # Ignore the previous "flag"
+	    if color != "@" 
+                x = local_secret_code.find_index(color)
+                # Color found in secret code
+                if x
+                    # Assign a "flag" for the codes
+                    local_secret_code[x] = "@"
+                    local_current_combination[index] = "@"
+                    
+                    # Create a piece for the feedback
+                    piece = Piece.new(current_player(),"0","0")
+                    place_player_marker(current_player(), piece,  row, index_feedback)
+                    
+                    index_feedback += 1
+		end
+            end
+	end 
+    end
+    
     def game
         # Generate the secret code
         @secret_code = generate_random_secret_code()
-        
-        # show_secret_code()
     
         # Print the board at the beginning of the game
 	@board.show()
 	
+	# Loop game
 	for i in 1..@total_turns do
 	    for j in 1..@secret_code_length do
 	    
@@ -96,14 +153,20 @@ class MastermindGame
 	        
 	        # Place the color
 	        place_player_marker(current_player(), piece,  i, j-1)
+	        
+	        # Show info to the user
 	        @board.show()
+	        print_game_message()
 	      
 	    end
 	    
-	    # Do the feedbak
-	    # Check the feedback for winner current_player()
-	        # Puts "Winner " + current_player().name  
-	        # Return
+	    # Check the user code vs the secret code and do the feedback
+	    check_combination(i, j-1, @board.canvas[11][0,@secret_code_length])
+	    
+	    # Show info to the user
+	    @board.show()
+	    print_game_message()
+	    
 	end
     end
     
